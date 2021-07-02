@@ -3,6 +3,18 @@ require 'rails_helper'
 RSpec.describe MovieService do
   subject(:movie_service) { MovieService.new }
   
+  describe "#fetch_movies" do
+    context "when given a user ID" do
+      let(:user_id) { 12345 }
+  
+      it "returns an array of movies ids for that user" do
+        movies = subject.fetch_movies(user_id)
+        binding.pry
+        expect(movies).to be_an_instance_of(Array)
+      end
+    end
+  end
+    
   describe "#fetch_movie_title" do
     let(:stubs)  { Faraday::Adapter::Test::Stubs.new }
     let(:conn)   { Faraday.new { |b| b.adapter(:test, stubs) } }
