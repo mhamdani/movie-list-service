@@ -40,6 +40,7 @@ group :development, :test do
   gem "rspec"
   gem "rspec_api_documentation"
   gem "rspec-rails"
+  gem 'pry'
 end
 
 group :development do
