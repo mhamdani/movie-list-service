@@ -7,33 +7,45 @@ class MovieService
     url = 'http://localhost:7001/'
   
     response = Faraday.get(url, users: user_id)
-    list = JSON.parse(response.body)  
-    list.each do |movie_id|
-      title = fetch_movie_title(movie_id).force_encoding("UTF-8")
-      image = fetch_movie_image(movie_id).force_encoding("UTF-8")
-      movie_id = movie_id
+    list = JSON.parse(response.body)
     
+    conn = Faraday::Connection.new("http://localhost:7003") do |faraday|
+      faraday.adapter :typhoeus
+    end
+    movie_image_reqs = []
+    conn.in_parallel do
+      list.each do |id|
+        images = conn.get(id.to_s)
+        movie_image_reqs << images
+      end 
+    end
+    
+    movie_images = movie_image_reqs.map { |req| req.body.force_encoding("UTF-8") }
+    
+    conn = Faraday::Connection.new("http://localhost:7002") do |faraday|
+      faraday.adapter :typhoeus
+    end
+    movie_title_reqs = []
+    conn.in_parallel do
+      list.each do |id|
+        titles = conn.get(id.to_s)
+        movie_title_reqs << titles
+      end 
+    end
+    
+    movie_titles = movie_title_reqs.map { |req| req.body.force_encoding("UTF-8") }
+      
+    list.each_with_index do |movie_id, index| 
+      movie_id = movie_id    
       movie = {
-        title: title,
-        image: image,
-        movieID: movie_id,
+        title: movie_titles[index],
+        image: movie_images[index],
+        movieID: movie_id
       }
+      
       movies << movie
     end
-    movies
-  end 
-  
-  def fetch_movie_title(movie_id)
-    conn = Faraday::Connection.new 'http://localhost:7002/'
-    response = conn.get movie_id.to_s
     
-    movie_title = response.body
-  end 
-  
-  def fetch_movie_image(movie_id)
-    conn = Faraday::Connection.new 'http://localhost:7003/'
-    response = conn.get movie_id.to_s
-  
-    movie_image = response.body
+    movies
   end 
 end
