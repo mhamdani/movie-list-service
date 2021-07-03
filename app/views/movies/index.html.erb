@@ -1,0 +1,23 @@
+<h1 align="center">Movie List Search</h1>
+
+<div class="well col-xs-8 col-xs-offset-2">
+  <%= form_tag search_movies_path, class: "pure-form pure-form-aligned" do %>
+
+      <div class="field is-horizontal">
+        <%= label_tag :user_id, "User ID", class: "field-label" %>
+        <div class="control field-body"><%= text_field_tag :user_id, nil, class: "input" %></div>
+      </div>
+    <div class="card card-content">
+      <div class="field is-horizontal">
+        <div class="field-label"></div>
+        <div class="field-body">
+          <div class="field is-grouped">
+            <div class="control">
+              <button type="submit" class="button is-primary">Search</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% end %>
+</div>
